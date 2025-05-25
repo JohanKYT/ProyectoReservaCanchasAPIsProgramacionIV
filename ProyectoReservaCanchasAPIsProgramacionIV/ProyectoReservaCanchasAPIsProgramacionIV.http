@@ -1,0 +1,6 @@
+@ProyectoReservaCanchasAPIsProgramacionIV_HostAddress = http://localhost:5177
+
+GET {{ProyectoReservaCanchasAPIsProgramacionIV_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
