@@ -21,7 +21,9 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Facultad>>> GetFacultads()
         {
-            return await _context.Facultad.ToListAsync();
+            return await _context.Facultad
+                     .Include(f => f.Campus)
+                     .ToListAsync();
         }
 
         // GET: api/Facultad/5

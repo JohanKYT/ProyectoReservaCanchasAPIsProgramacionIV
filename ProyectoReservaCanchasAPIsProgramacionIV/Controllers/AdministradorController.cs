@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
+using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 using ProyectoReservaCanchasAPIsProgramacionIV.Models;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
@@ -21,14 +21,21 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Administrador>>> GetAdministradors()
         {
-            return await _context.Administrador.ToListAsync();
+            return await _context.Administrador
+                .Include(a => a.Facultad)
+                .ThenInclude(f => f.Campus)
+                .ToListAsync();
         }
 
         // GET: api/Administrador/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Administrador>> GetAdministrador(int id)
         {
-            var item = await _context.Administrador.FindAsync(id);
+            var item = await _context.Administrador
+                .Include(a => a.Facultad)
+                .ThenInclude(f => f.Campus)
+                .FirstOrDefaultAsync(a => a.BannerId == id);
+
             if (item == null)
                 return NotFound();
 
@@ -37,21 +44,45 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         // POST: api/Administrador
         [HttpPost]
-        public async Task<ActionResult<Administrador>> PostAdministrador(Administrador item)
+        public async Task<ActionResult<Administrador>> PostAdministrador(AdministradorDTO dto)
         {
+            var item = new Administrador
+            {
+                BannerId = dto.BannerId,
+                Nombre = dto.Nombre,
+                Correo = dto.Correo,
+                Password = dto.Password,
+                Telefono = dto.Telefono,
+                Direccion = dto.Direccion,
+                FechaNacimiento = dto.FechaNacimiento,
+                TipoPersona = dto.TipoPersona,
+                FacultadId = dto.FacultadId
+            };
+
             _context.Administrador.Add(item);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetAdministrador), new { id = item.BannerId }, item);
         }
 
         // PUT: api/Administrador/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAdministrador(int id, Administrador item)
+        public async Task<IActionResult> PutAdministrador(int id, AdministradorDTO dto)
         {
-            if (id != item.BannerId)
-                return BadRequest();
+            var administrador = await _context.Administrador.FindAsync(id);
 
-            _context.Entry(item).State = EntityState.Modified;
+            if (administrador == null)
+                return NotFound();
+
+            // Actualizar solo las propiedades necesarias
+            administrador.Nombre = dto.Nombre;
+            administrador.Correo = dto.Correo;
+            administrador.Password = dto.Password;
+            administrador.Telefono = dto.Telefono;
+            administrador.Direccion = dto.Direccion;
+            administrador.FechaNacimiento = dto.FechaNacimiento;
+            administrador.TipoPersona = dto.TipoPersona;
+            administrador.FacultadId = dto.FacultadId;
 
             try
             {
@@ -59,7 +90,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AdministradorExists(id))
+                if (!_context.Administrador.Any(e => e.BannerId == id))
                     return NotFound();
                 else
                     throw;
