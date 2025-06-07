@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 using ProyectoReservaCanchasAPIsProgramacionIV.Models;
+using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 {
@@ -19,51 +20,71 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         // GET: api/Campus
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Campus>>> GetCampuss()
+        public async Task<ActionResult<IEnumerable<CampusDTO>>> GetCampuss()
         {
-            return await _context.Campus.ToListAsync();
+            var campusList = await _context.Campus.ToListAsync();
+
+            var listDTO = campusList.Select(c => new CampusDTO
+            {
+                CampusId = c.Id,
+                Nombre = c.Nombre,
+                Direccion = c.Direccion
+            }).ToList();
+
+            return Ok(listDTO);
         }
 
         // GET: api/Campus/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Campus>> GetCampus(int id)
+        public async Task<ActionResult<CampusDTO>> GetCampus(int id)
         {
-            var item = await _context.Campus.FindAsync(id);
-            if (item == null)
+            var campus = await _context.Campus.FindAsync(id);
+            if (campus == null)
                 return NotFound();
 
-            return item;
+            var dto = new CampusDTO
+            {
+                CampusId = campus.Id,
+                Nombre = campus.Nombre,
+                Direccion = campus.Direccion
+            };
+
+            return Ok(dto);
         }
 
         // POST: api/Campus
         [HttpPost]
-        public async Task<ActionResult<Campus>> PostCampus(Campus item)
+        public async Task<ActionResult<Campus>> PostCampus(CampusDTO dto)
         {
-            _context.Campus.Add(item);
+            var campus = new Campus
+            {
+                Nombre = dto.Nombre,
+                Direccion = dto.Direccion
+            };
+
+            _context.Campus.Add(campus);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCampus), new { id = item.Id }, item);
+
+            dto.CampusId = campus.Id;
+
+            return CreatedAtAction(nameof(GetCampus), new { id = campus.Id }, dto);
         }
 
         // PUT: api/Campus/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCampus(int id, Campus item)
+        public async Task<IActionResult> PutCampus(int id, CampusDTO dto)
         {
-            if (id != item.Id)
+            if (id != dto.CampusId)
                 return BadRequest();
 
-            _context.Entry(item).State = EntityState.Modified;
+            var campus = await _context.Campus.FindAsync(id);
+            if (campus == null)
+                return NotFound();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CampusExists(id))
-                    return NotFound();
-                else
-                    throw;
-            }
+            campus.Nombre = dto.Nombre;
+            campus.Direccion = dto.Direccion;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 using ProyectoReservaCanchasAPIsProgramacionIV.Models;
+using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 {
@@ -19,53 +20,82 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         // GET: api/Facultad
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Facultad>>> GetFacultads()
+        public async Task<ActionResult<IEnumerable<FacultadDTO>>> GetFacultades()
         {
-            return await _context.Facultad
-                     .Include(f => f.Campus)
-                     .ToListAsync();
+            var facultades = await _context.Facultad
+        .Include(f => f.Campus) // Asegura que incluya el campus relacionado
+        .ToListAsync();
+
+            var listaDTO = facultades.Select(f => new FacultadDTO
+            {
+                FacultadId = f.Id,
+                Nombre = f.Nombre,
+                CampusId = f.CampusId,
+                Campus = f.Campus == null ? null : new CampusDTO
+                {
+                    CampusId = f.Campus.Id,
+                    Nombre = f.Campus.Nombre,
+                    Direccion = f.Campus.Direccion
+                }
+            }).ToList();
+
+            return Ok(listaDTO);
         }
 
         // GET: api/Facultad/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Facultad>> GetFacultad(int id)
+        public async Task<ActionResult<FacultadDTO>> GetFacultad(int id)
         {
-            var item = await _context.Facultad.FindAsync(id);
-            if (item == null)
+            var f = await _context.Facultad
+                .Include(fa => fa.Campus)
+                .FirstOrDefaultAsync(fa => fa.Id == id);
+
+            if (f == null)
                 return NotFound();
 
-            return item;
+            var dto = new FacultadDTO
+            {
+                FacultadId = f.Id,
+                Nombre = f.Nombre,
+                CampusId = f.CampusId
+            };
+
+            return Ok(dto);
         }
 
         // POST: api/Facultad
         [HttpPost]
-        public async Task<ActionResult<Facultad>> PostFacultad(Facultad item)
+        public async Task<ActionResult<Facultad>> PostFacultad(FacultadDTO dto)
         {
-            _context.Facultad.Add(item);
+            var facultad = new Facultad
+            {
+                Nombre = dto.Nombre,
+                CampusId = dto.CampusId
+            };
+
+            _context.Facultad.Add(facultad);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetFacultad), new { id = item.Id }, item);
+
+            dto.FacultadId = facultad.Id;
+
+            return CreatedAtAction(nameof(GetFacultad), new { id = facultad.Id }, dto);
         }
 
         // PUT: api/Facultad/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutFacultad(int id, Facultad item)
+        public async Task<IActionResult> PutFacultad(int id, FacultadDTO dto)
         {
-            if (id != item.Id)
+            if (id != dto.FacultadId)
                 return BadRequest();
 
-            _context.Entry(item).State = EntityState.Modified;
+            var facultad = await _context.Facultad.FindAsync(id);
+            if (facultad == null)
+                return NotFound();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FacultadExists(id))
-                    return NotFound();
-                else
-                    throw;
-            }
+            facultad.Nombre = dto.Nombre;
+            facultad.CampusId = dto.CampusId;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -74,11 +104,11 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFacultad(int id)
         {
-            var item = await _context.Facultad.FindAsync(id);
-            if (item == null)
+            var facultad = await _context.Facultad.FindAsync(id);
+            if (facultad == null)
                 return NotFound();
 
-            _context.Facultad.Remove(item);
+            _context.Facultad.Remove(facultad);
             await _context.SaveChangesAsync();
 
             return NoContent();
