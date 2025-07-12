@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 
@@ -11,9 +12,11 @@ using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
 {
     [DbContext(typeof(BaseDatos_ReservarCanchas_ProyectoProgramacionIV))]
-    partial class BaseDatos_ReservarCanchas_ProyectoProgramacionIVModelSnapshot : ModelSnapshot
+    [Migration("20250712035639_SeAgregoMasClaridadIDs")]
+    partial class SeAgregoMasClaridadIDs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

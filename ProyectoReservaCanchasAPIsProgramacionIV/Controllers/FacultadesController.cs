@@ -28,12 +28,12 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
             var listaDTO = facultades.Select(f => new FacultadDTO
             {
-                FacultadId = f.Id,
+                FacultadId = f.FacultadId,
                 Nombre = f.Nombre,
                 CampusId = f.CampusId,
                 Campus = f.Campus == null ? null : new CampusDTO
                 {
-                    CampusId = f.Campus.Id,
+                    CampusId = f.Campus.CampusId,
                     Nombre = f.Campus.Nombre,
                     Direccion = f.Campus.Direccion
                 }
@@ -48,14 +48,14 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         {
             var f = await _context.Facultad
                 .Include(fa => fa.Campus)
-                .FirstOrDefaultAsync(fa => fa.Id == id);
+                .FirstOrDefaultAsync(fa => fa.FacultadId == id);
 
             if (f == null)
                 return NotFound();
 
             var dto = new FacultadDTO
             {
-                FacultadId = f.Id,
+                FacultadId = f.FacultadId,
                 Nombre = f.Nombre,
                 CampusId = f.CampusId
             };
@@ -76,9 +76,9 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             _context.Facultad.Add(facultad);
             await _context.SaveChangesAsync();
 
-            dto.FacultadId = facultad.Id;
+            dto.FacultadId = facultad.FacultadId;
 
-            return CreatedAtAction(nameof(GetFacultad), new { id = facultad.Id }, dto);
+            return CreatedAtAction(nameof(GetFacultad), new { id = facultad.FacultadId }, dto);
         }
 
         // PUT: api/Facultad/5
@@ -116,7 +116,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         private bool FacultadExists(int id)
         {
-            return _context.Facultad.Any(e => e.Id == id);
+            return _context.Facultad.Any(e => e.FacultadId == id);
         }
     }
 }

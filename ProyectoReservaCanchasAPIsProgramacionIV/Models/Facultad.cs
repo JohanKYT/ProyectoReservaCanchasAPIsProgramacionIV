@@ -6,7 +6,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Models
     public class Facultad
     {
         [Key]
-        public int Id { get; set; }
+        public int FacultadId { get; set; }
         [MaxLength(100)]
         public string Nombre { get; set; }
         public int CampusId { get; set; }

@@ -26,7 +26,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
             var listDTO = campusList.Select(c => new CampusDTO
             {
-                CampusId = c.Id,
+                CampusId = c.CampusId,
                 Nombre = c.Nombre,
                 Direccion = c.Direccion
             }).ToList();
@@ -44,7 +44,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
             var dto = new CampusDTO
             {
-                CampusId = campus.Id,
+                CampusId = campus.CampusId,
                 Nombre = campus.Nombre,
                 Direccion = campus.Direccion
             };
@@ -65,9 +65,9 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             _context.Campus.Add(campus);
             await _context.SaveChangesAsync();
 
-            dto.CampusId = campus.Id;
+            dto.CampusId = campus.CampusId;
 
-            return CreatedAtAction(nameof(GetCampus), new { id = campus.Id }, dto);
+            return CreatedAtAction(nameof(GetCampus), new { id = campus.CampusId }, dto);
         }
 
         // PUT: api/Campus/5
@@ -105,7 +105,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         private bool CampusExists(int id)
         {
-            return _context.Campus.Any(e => e.Id == id);
+            return _context.Campus.Any(e => e.CampusId == id);
         }
     }
 }

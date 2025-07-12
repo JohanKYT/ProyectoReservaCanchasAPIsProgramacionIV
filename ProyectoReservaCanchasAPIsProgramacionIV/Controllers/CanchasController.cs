@@ -35,7 +35,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
                 CampusId = c.CampusId,
                 Campus = c.Campus == null ? null : new CampusDTO
                 {
-                    CampusId = c.Campus.Id,
+                    CampusId = c.Campus.CampusId,
                     Nombre = c.Campus.Nombre,
                     Direccion = c.Campus.Direccion
                 }
@@ -64,7 +64,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
                 CampusId = cancha.CampusId,
                 Campus = cancha.Campus == null ? null : new CampusDTO
                 {
-                    CampusId = cancha.Campus.Id,
+                    CampusId = cancha.Campus.CampusId,
                     Nombre = cancha.Campus.Nombre,
                     Direccion = cancha.Campus.Direccion
                 }

@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
-using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 using ProyectoReservaCanchasAPIsProgramacionIV.Models;
-using System;
+using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 {
@@ -49,7 +49,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             _context.Carrera.Add(item);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetCarrera), new { id = item.Id }, item);
+            return CreatedAtAction(nameof(GetCarrera), new { id = item.CarreraId }, item);
         }
 
         // PUT: api/Carreras/5
@@ -70,7 +70,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Carrera.Any(e => e.Id == id))
+                if (!_context.Carrera.Any(e => e.CarreraId == id))
                     return NotFound();
                 else
                     throw;
@@ -95,7 +95,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         private bool CarreraExists(int id)
         {
-            return _context.Carrera.Any(e => e.Id == id);
+            return _context.Carrera.Any(e => e.CarreraId == id);
         }
     }
 }
