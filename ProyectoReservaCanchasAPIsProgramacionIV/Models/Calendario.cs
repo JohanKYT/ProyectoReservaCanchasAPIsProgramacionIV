@@ -7,15 +7,20 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Models
     {
         [Key]
         public int CalendarioId { get; set; }
-        public DateTime FechaInicio { get; set; }
-        public DateTime FechaFin { get; set; }
-        [MaxLength(50)]
-        public string Estado { get; set; } = string.Empty;
-        [MaxLength(500)]
+
+        public DateTime FechaHoraInicio { get; set; }
+        public DateTime FechaHoraFin { get; set; }
+
+        public string Estado { get; set; } = "Pendiente";
         public string NotasDetallada { get; set; } = string.Empty;
+
         public int CanchaId { get; set; }
         [ForeignKey("CanchaId")]
-        public Cancha? Cancha { get; set; }
+        public Cancha Cancha { get; set; }
+
+        public int PersonaUdlaId { get; set; }
+        [ForeignKey("PersonaUdlaId")]
+        public PersonaUdla PersonaUdla { get; set; }
     }
 
 }

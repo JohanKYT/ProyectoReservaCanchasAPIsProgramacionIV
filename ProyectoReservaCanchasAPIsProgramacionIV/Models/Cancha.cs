@@ -12,10 +12,9 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Models
 
         [MaxLength(50)]
         public string Tipo { get; set; } 
-
         public bool Disponible { get; set; } = true; 
-
-        public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
+        public Campus Campus { get; set; } = null!; // Relación con Campus
+        public int CampusId { get; set; } // Llave foránea para Campus
         public ICollection<Calendario> Calendarios { get; set; } = new List<Calendario>();
     }
 }

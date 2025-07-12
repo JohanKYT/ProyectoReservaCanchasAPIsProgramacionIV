@@ -1,8 +1,9 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
+using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 using ProyectoReservaCanchasAPIsProgramacionIV.Models;
+using System;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 {
@@ -17,14 +18,14 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             _context = context;
         }
 
-        // GET: api/PersonalMantenimiento
+        // GET: api/PersonalMantenimientos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PersonalMantenimiento>>> GetPersonalMantenimientos()
         {
             return await _context.PersonalMantenimiento.ToListAsync();
         }
 
-        // GET: api/PersonalMantenimiento/5
+        // GET: api/PersonalMantenimientos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PersonalMantenimiento>> GetPersonalMantenimiento(int id)
         {
@@ -35,23 +36,44 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return item;
         }
 
-        // POST: api/PersonalMantenimiento
+        // POST: api/PersonalMantenimientos
         [HttpPost]
-        public async Task<ActionResult<PersonalMantenimiento>> PostPersonalMantenimiento(PersonalMantenimiento item)
+        public async Task<ActionResult<PersonalMantenimiento>> PostPersonalMantenimiento(PersonalMantenimientoDTO dto)
         {
+            var item = new PersonalMantenimiento
+            {
+                BannerId = dto.BannerId,
+                Nombre = dto.Nombre,
+                Correo = dto.Correo,
+                Password = dto.Password,
+                Telefono = dto.Telefono,
+                Direccion = dto.Direccion,
+                FechaNacimiento = dto.FechaNacimiento,
+                TipoPersona = dto.TipoPersona
+            };
+
             _context.PersonalMantenimiento.Add(item);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetPersonalMantenimiento), new { id = item.BannerId }, item);
         }
 
-        // PUT: api/PersonalMantenimiento/5
+        // PUT: api/PersonalMantenimientos/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPersonalMantenimiento(int id, PersonalMantenimiento item)
+        public async Task<IActionResult> PutPersonalMantenimiento(int id, PersonalMantenimientoDTO dto)
         {
-            if (id != item.BannerId)
-                return BadRequest();
+            var personal = await _context.PersonalMantenimiento.FindAsync(id);
 
-            _context.Entry(item).State = EntityState.Modified;
+            if (personal == null)
+                return NotFound();
+
+            personal.Nombre = dto.Nombre;
+            personal.Correo = dto.Correo;
+            personal.Password = dto.Password;
+            personal.Telefono = dto.Telefono;
+            personal.Direccion = dto.Direccion;
+            personal.FechaNacimiento = dto.FechaNacimiento;
+            personal.TipoPersona = dto.TipoPersona;
 
             try
             {
@@ -59,7 +81,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PersonalMantenimientoExists(id))
+                if (!_context.PersonalMantenimiento.Any(e => e.BannerId == id))
                     return NotFound();
                 else
                     throw;
@@ -68,7 +90,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return NoContent();
         }
 
-        // DELETE: api/PersonalMantenimiento/5
+        // DELETE: api/PersonalMantenimientos/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePersonalMantenimiento(int id)
         {

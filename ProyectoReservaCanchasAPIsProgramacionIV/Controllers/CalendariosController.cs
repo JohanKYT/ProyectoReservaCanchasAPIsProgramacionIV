@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 using ProyectoReservaCanchasAPIsProgramacionIV.Models;
+using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 {
@@ -17,41 +17,65 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             _context = context;
         }
 
-        // GET: api/Calendario
+        // GET: api/Calendarios
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Calendario>>> GetCalendarios()
         {
-            return await _context.Calendario.ToListAsync();
+            return await _context.Calendario
+                .Include(c => c.Cancha)
+                .Include(c => c.PersonaUdla)
+                .ToListAsync();
         }
 
-        // GET: api/Calendario/5
+        // GET: api/Calendarios/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Calendario>> GetCalendario(int id)
         {
-            var item = await _context.Calendario.FindAsync(id);
+            var item = await _context.Calendario
+                .Include(c => c.Cancha)
+                .Include(c => c.PersonaUdla)
+                .FirstOrDefaultAsync(c => c.CalendarioId == id);
+
             if (item == null)
                 return NotFound();
 
             return item;
         }
 
-        // POST: api/Calendario
+        // POST: api/Calendarios
         [HttpPost]
-        public async Task<ActionResult<Calendario>> PostCalendario(Calendario item)
+        public async Task<ActionResult<Calendario>> PostCalendario(CalendarioDTO dto)
         {
-            _context.Calendario.Add(item);
+            var calendario = new Calendario
+            {
+                FechaHoraInicio = dto.FechaHoraInicio,
+                FechaHoraFin = dto.FechaHoraFin,
+                Estado = dto.Estado,
+                NotasDetallada = dto.NotasDetallada,
+                CanchaId = dto.CanchaId,
+                PersonaUdlaId = dto.PersonaUdlaId
+            };
+
+            _context.Calendario.Add(calendario);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCalendario), new { id = item.CalendarioId }, item);
+
+            return CreatedAtAction(nameof(GetCalendario), new { id = calendario.CalendarioId }, calendario);
         }
 
-        // PUT: api/Calendario/5
+        // PUT: api/Calendarios/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCalendario(int id, Calendario item)
+        public async Task<IActionResult> PutCalendario(int id, CalendarioDTO dto)
         {
-            if (id != item.CalendarioId)
-                return BadRequest();
+            var calendario = await _context.Calendario.FindAsync(id);
+            if (calendario == null)
+                return NotFound();
 
-            _context.Entry(item).State = EntityState.Modified;
+            calendario.FechaHoraInicio = dto.FechaHoraInicio;
+            calendario.FechaHoraFin = dto.FechaHoraFin;
+            calendario.Estado = dto.Estado;
+            calendario.NotasDetallada = dto.NotasDetallada;
+            calendario.CanchaId = dto.CanchaId;
+            calendario.PersonaUdlaId = dto.PersonaUdlaId;
 
             try
             {
@@ -68,15 +92,15 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Calendario/5
+        // DELETE: api/Calendarios/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCalendario(int id)
         {
-            var item = await _context.Calendario.FindAsync(id);
-            if (item == null)
+            var calendario = await _context.Calendario.FindAsync(id);
+            if (calendario == null)
                 return NotFound();
 
-            _context.Calendario.Remove(item);
+            _context.Calendario.Remove(calendario);
             await _context.SaveChangesAsync();
 
             return NoContent();

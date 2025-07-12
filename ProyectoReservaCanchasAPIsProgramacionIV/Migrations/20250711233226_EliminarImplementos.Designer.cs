@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 
@@ -11,9 +12,11 @@ using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
 {
     [DbContext(typeof(BaseDatos_ReservarCanchas_ProyectoProgramacionIV))]
-    partial class BaseDatos_ReservarCanchas_ProyectoProgramacionIVModelSnapshot : ModelSnapshot
+    [Migration("20250711233226_EliminarImplementos")]
+    partial class EliminarImplementos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,26 +38,28 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
 
                     b.Property<string>("Estado")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("FechaHoraFin")
+                    b.Property<DateTime>("FechaFin")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("FechaHoraInicio")
+                    b.Property<DateTime>("FechaInicio")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NotasDetallada")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("PersonaUdlaId")
+                    b.Property<int?>("ReservaId")
                         .HasColumnType("int");
 
                     b.HasKey("CalendarioId");
 
                     b.HasIndex("CanchaId");
 
-                    b.HasIndex("PersonaUdlaId");
+                    b.HasIndex("ReservaId");
 
                     b.ToTable("Calendario");
                 });
@@ -90,9 +95,6 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CanchaId"));
 
-                    b.Property<int>("CampusId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("Disponible")
                         .HasColumnType("bit");
 
@@ -107,8 +109,6 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("CanchaId");
-
-                    b.HasIndex("CampusId");
 
                     b.ToTable("Cancha");
                 });
@@ -209,6 +209,35 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Reserva", b =>
+                {
+                    b.Property<int>("ReservaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaId"));
+
+                    b.Property<int>("CanchaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaFin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PersonaUdlaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReservaId");
+
+                    b.HasIndex("CanchaId");
+
+                    b.HasIndex("PersonaUdlaId");
+
+                    b.ToTable("Reservas", (string)null);
+                });
+
             modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Administrador", b =>
                 {
                     b.HasBaseType("ProyectoReservaCanchasAPIsProgramacionIV.Models.PersonaUdla");
@@ -248,26 +277,11 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProyectoReservaCanchasAPIsProgramacionIV.Models.PersonaUdla", "PersonaUdla")
-                        .WithMany()
-                        .HasForeignKey("PersonaUdlaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("ProyectoReservaCanchasAPIsProgramacionIV.Models.Reserva", null)
+                        .WithMany("Calendarios")
+                        .HasForeignKey("ReservaId");
 
                     b.Navigation("Cancha");
-
-                    b.Navigation("PersonaUdla");
-                });
-
-            modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Cancha", b =>
-                {
-                    b.HasOne("ProyectoReservaCanchasAPIsProgramacionIV.Models.Campus", "Campus")
-                        .WithMany()
-                        .HasForeignKey("CampusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Campus");
                 });
 
             modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Carrera", b =>
@@ -290,6 +304,25 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
                         .IsRequired();
 
                     b.Navigation("Campus");
+                });
+
+            modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Reserva", b =>
+                {
+                    b.HasOne("ProyectoReservaCanchasAPIsProgramacionIV.Models.Cancha", "Cancha")
+                        .WithMany("Reservas")
+                        .HasForeignKey("CanchaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProyectoReservaCanchasAPIsProgramacionIV.Models.PersonaUdla", "PersonaUdla")
+                        .WithMany()
+                        .HasForeignKey("PersonaUdlaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cancha");
+
+                    b.Navigation("PersonaUdla");
                 });
 
             modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Administrador", b =>
@@ -315,6 +348,13 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Migrations
                 });
 
             modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Cancha", b =>
+                {
+                    b.Navigation("Calendarios");
+
+                    b.Navigation("Reservas");
+                });
+
+            modelBuilder.Entity("ProyectoReservaCanchasAPIsProgramacionIV.Models.Reserva", b =>
                 {
                     b.Navigation("Calendarios");
                 });

@@ -1,8 +1,9 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
+using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
 using ProyectoReservaCanchasAPIsProgramacionIV.Models;
+using System;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 {
@@ -17,14 +18,14 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             _context = context;
         }
 
-        // GET: api/Carrera
+        // GET: api/Carreras
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Carrera>>> GetCarreras()
         {
             return await _context.Carrera.ToListAsync();
         }
 
-        // GET: api/Carrera/5
+        // GET: api/Carreras/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Carrera>> GetCarrera(int id)
         {
@@ -35,23 +36,33 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return item;
         }
 
-        // POST: api/Carrera
+        // POST: api/Carreras
         [HttpPost]
-        public async Task<ActionResult<Carrera>> PostCarrera(Carrera item)
+        public async Task<ActionResult<Carrera>> PostCarrera(CarreraDTO dto)
         {
+            var item = new Carrera
+            {
+                Nombre = dto.Nombre,
+                FacultadId = dto.FacultadId
+            };
+
             _context.Carrera.Add(item);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetCarrera), new { id = item.Id }, item);
         }
 
-        // PUT: api/Carrera/5
+        // PUT: api/Carreras/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCarrera(int id, Carrera item)
+        public async Task<IActionResult> PutCarrera(int id, CarreraDTO dto)
         {
-            if (id != item.Id)
-                return BadRequest();
+            var carrera = await _context.Carrera.FindAsync(id);
 
-            _context.Entry(item).State = EntityState.Modified;
+            if (carrera == null)
+                return NotFound();
+
+            carrera.Nombre = dto.Nombre;
+            carrera.FacultadId = dto.FacultadId;
 
             try
             {
@@ -59,7 +70,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CarreraExists(id))
+                if (!_context.Carrera.Any(e => e.Id == id))
                     return NotFound();
                 else
                     throw;
@@ -68,7 +79,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Carrera/5
+        // DELETE: api/Carreras/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCarrera(int id)
         {
