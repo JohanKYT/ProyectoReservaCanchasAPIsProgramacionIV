@@ -3,6 +3,18 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
+
 
 // Add services to the container.
 
@@ -28,5 +40,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+// Enable CORS globally
+app.UseCors("AllowAll");
 
 app.Run();

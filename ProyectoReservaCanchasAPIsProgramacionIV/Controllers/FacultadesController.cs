@@ -67,6 +67,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPost]
         public async Task<ActionResult<Facultad>> PostFacultad(FacultadDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var facultad = new Facultad
             {
                 Nombre = dto.Nombre,
@@ -85,6 +87,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutFacultad(int id, FacultadDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             if (id != dto.FacultadId)
                 return BadRequest();
 

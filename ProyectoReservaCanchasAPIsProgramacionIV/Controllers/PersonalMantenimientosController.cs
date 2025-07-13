@@ -40,16 +40,17 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPost]
         public async Task<ActionResult<PersonalMantenimiento>> PostPersonalMantenimiento(PersonalMantenimientoDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var item = new PersonalMantenimiento
             {
-                BannerId = dto.BannerId,
                 Nombre = dto.Nombre,
                 Correo = dto.Correo,
                 Password = dto.Password,
                 Telefono = dto.Telefono,
                 Direccion = dto.Direccion,
                 FechaNacimiento = dto.FechaNacimiento,
-                TipoPersona = dto.TipoPersona
+                TipoPersona = "PersonalMantenimiento"
             };
 
             _context.PersonalMantenimiento.Add(item);
@@ -62,6 +63,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPersonalMantenimiento(int id, PersonalMantenimientoDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var personal = await _context.PersonalMantenimiento.FindAsync(id);
 
             if (personal == null)
@@ -73,7 +76,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             personal.Telefono = dto.Telefono;
             personal.Direccion = dto.Direccion;
             personal.FechaNacimiento = dto.FechaNacimiento;
-            personal.TipoPersona = dto.TipoPersona;
+            personal.TipoPersona = "PersonalMantenimiento";
 
             try
             {

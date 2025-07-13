@@ -49,16 +49,17 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPost]
         public async Task<ActionResult<Estudiante>> PostEstudiante(EstudianteDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var item = new Estudiante
             {
-                BannerId = dto.BannerId,
                 Nombre = dto.Nombre,
                 Correo = dto.Correo,
                 Password = dto.Password,
                 Telefono = dto.Telefono,
                 Direccion = dto.Direccion,
                 FechaNacimiento = dto.FechaNacimiento,
-                TipoPersona = dto.TipoPersona,
+                TipoPersona = "Estudiante",
                 CarreraId = dto.CarreraId
             };
 
@@ -72,6 +73,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEstudiante(int id, EstudianteDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var estudiante = await _context.Estudiante.FindAsync(id);
 
             if (estudiante == null)
@@ -83,7 +86,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             estudiante.Telefono = dto.Telefono;
             estudiante.Direccion = dto.Direccion;
             estudiante.FechaNacimiento = dto.FechaNacimiento;
-            estudiante.TipoPersona = dto.TipoPersona;
+            estudiante.TipoPersona = "Estudiante";
             estudiante.CarreraId = dto.CarreraId;
 
             try

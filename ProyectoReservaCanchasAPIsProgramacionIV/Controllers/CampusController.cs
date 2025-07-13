@@ -74,6 +74,9 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCampus(int id, CampusDTO dto)
         {
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             if (id != dto.CampusId)
                 return BadRequest();
 

@@ -9,6 +9,5 @@
         public string Telefono { get; set; }
         public string Direccion { get; set; }
         public DateTime FechaNacimiento { get; set; }
-        public string TipoPersona { get; set; }
     }
 }

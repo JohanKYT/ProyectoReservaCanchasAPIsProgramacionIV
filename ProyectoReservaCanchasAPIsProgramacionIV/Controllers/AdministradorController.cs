@@ -46,16 +46,17 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPost]
         public async Task<ActionResult<Administrador>> PostAdministrador(AdministradorDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var item = new Administrador
             {
-                BannerId = dto.BannerId,
                 Nombre = dto.Nombre,
                 Correo = dto.Correo,
                 Password = dto.Password,
                 Telefono = dto.Telefono,
                 Direccion = dto.Direccion,
                 FechaNacimiento = dto.FechaNacimiento,
-                TipoPersona = dto.TipoPersona,
+                TipoPersona = "Administrador", // Asignar un tipo de persona por defecto
                 FacultadId = dto.FacultadId
             };
 
@@ -69,6 +70,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAdministrador(int id, AdministradorDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var administrador = await _context.Administrador.FindAsync(id);
 
             if (administrador == null)
@@ -81,7 +84,7 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             administrador.Telefono = dto.Telefono;
             administrador.Direccion = dto.Direccion;
             administrador.FechaNacimiento = dto.FechaNacimiento;
-            administrador.TipoPersona = dto.TipoPersona;
+            administrador.TipoPersona = "Administrador"; // Asignar un tipo de persona por defecto
             administrador.FacultadId = dto.FacultadId;
 
             try

@@ -46,6 +46,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPost]
         public async Task<ActionResult<Calendario>> PostCalendario(CalendarioDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var calendario = new Calendario
             {
                 FechaHoraInicio = dto.FechaHoraInicio,
@@ -66,6 +68,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCalendario(int id, CalendarioDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var calendario = await _context.Calendario.FindAsync(id);
             if (calendario == null)
                 return NotFound();

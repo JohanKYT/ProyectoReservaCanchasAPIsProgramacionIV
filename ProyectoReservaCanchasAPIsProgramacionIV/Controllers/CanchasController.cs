@@ -77,6 +77,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPost]
         public async Task<ActionResult<CanchaDTO>> PostCancha(CanchaDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var cancha = new Cancha
             {
                 Nombre = dto.Nombre,
@@ -97,6 +99,8 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCancha(int id, CanchaDTO dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             if (id != dto.CanchaId)
                 return BadRequest();
 
