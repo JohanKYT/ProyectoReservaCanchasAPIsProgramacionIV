@@ -19,27 +19,56 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         // GET: api/Calendarios
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Calendario>>> GetCalendarios()
+        public async Task<ActionResult<IEnumerable<CalendarioDTO>>> GetCalendarios()
         {
-            return await _context.Calendario
+            var calendarios = await _context.Calendario
                 .Include(c => c.Cancha)
                 .Include(c => c.PersonaUdla)
+                .Select(c => new CalendarioDTO
+                {
+                    CalendarioId = c.CalendarioId,
+                    FechaHoraInicio = c.FechaHoraInicio,
+                    FechaHoraFin = c.FechaHoraFin,
+                    Estado = c.Estado,
+                    NotasDetallada = c.NotasDetallada,
+                    CanchaId = c.CanchaId,
+                    NombreCancha = c.Cancha != null ? c.Cancha.Nombre : null,
+                    PersonaUdlaId = c.PersonaUdlaId,
+                    NombrePersona = c.PersonaUdla != null ? c.PersonaUdla.Nombre : null,
+                    TipoPersona = EF.Property<string>(c.PersonaUdla, "TipoPersona")
+                })
                 .ToListAsync();
+
+            return calendarios;
         }
 
         // GET: api/Calendarios/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Calendario>> GetCalendario(int id)
+        public async Task<ActionResult<CalendarioDTO>> GetCalendario(int id)
         {
-            var item = await _context.Calendario
+            var calendario = await _context.Calendario
                 .Include(c => c.Cancha)
                 .Include(c => c.PersonaUdla)
-                .FirstOrDefaultAsync(c => c.CalendarioId == id);
+                .Where(c => c.CalendarioId == id)
+                .Select(c => new CalendarioDTO
+                {
+                    CalendarioId = c.CalendarioId,
+                    FechaHoraInicio = c.FechaHoraInicio,
+                    FechaHoraFin = c.FechaHoraFin,
+                    Estado = c.Estado,
+                    NotasDetallada = c.NotasDetallada,
+                    CanchaId = c.CanchaId,
+                    NombreCancha = c.Cancha != null ? c.Cancha.Nombre : null,
+                    PersonaUdlaId = c.PersonaUdlaId,
+                    NombrePersona = c.PersonaUdla != null ? c.PersonaUdla.Nombre : null,
+                    TipoPersona = EF.Property<string>(c.PersonaUdla, "TipoPersona")
+                })
+                .FirstOrDefaultAsync();
 
-            if (item == null)
+            if (calendario == null)
                 return NotFound();
 
-            return item;
+            return calendario;
         }
 
         // POST: api/Calendarios

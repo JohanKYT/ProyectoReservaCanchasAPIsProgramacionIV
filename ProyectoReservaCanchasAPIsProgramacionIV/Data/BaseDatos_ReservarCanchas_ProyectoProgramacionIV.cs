@@ -31,7 +31,13 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Data
                 .HasValue<Estudiante>("Estudiante")
                 .HasValue<Administrador>("Administrador")
                 .HasValue<PersonalMantenimiento>("PersonalMantenimiento");
-
+            // Relación de clave foránea solo para Administrador con Facultad
+            modelBuilder.Entity<Administrador>()
+                .HasOne(a => a.Facultad)
+                .WithMany()  // No es necesario definir propiedad inversa en Facultad
+                .HasForeignKey(a => a.FacultadId)
+                .OnDelete(DeleteBehavior.Restrict);  // Para evitar eliminación en cascada si no se desea
         }
+
     }
 }

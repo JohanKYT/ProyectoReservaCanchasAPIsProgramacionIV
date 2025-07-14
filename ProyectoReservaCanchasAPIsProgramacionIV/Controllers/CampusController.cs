@@ -96,11 +96,16 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCampus(int id)
         {
-            var item = await _context.Campus.FindAsync(id);
-            if (item == null)
+            var campus = await _context.Campus.FindAsync(id);
+            if (campus == null)
                 return NotFound();
 
-            _context.Campus.Remove(item);
+            // Verificar si tiene facultades asociadas
+            bool tieneFacultades = _context.Facultad.Any(f => f.CampusId == id);
+            if (tieneFacultades)
+                return BadRequest("No se puede eliminar el campus porque tiene facultades asociadas.");
+
+            _context.Campus.Remove(campus);
             await _context.SaveChangesAsync();
 
             return NoContent();

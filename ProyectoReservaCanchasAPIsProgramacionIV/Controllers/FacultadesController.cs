@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoReservaCanchasAPIsProgramacionIV.Data;
-using ProyectoReservaCanchasAPIsProgramacionIV.Models;
 using ProyectoReservaCanchasAPIsProgramacionIV.DTOs;
+using ProyectoReservaCanchasAPIsProgramacionIV.Models;
 
 namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 {
@@ -18,57 +17,43 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             _context = context;
         }
 
-        // GET: api/Facultad
+        // GET: api/Facultades
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FacultadDTO>>> GetFacultades()
         {
-            var facultades = await _context.Facultad
-        .Include(f => f.Campus) // Asegura que incluya el campus relacionado
-        .ToListAsync();
+            var lista = await _context.Facultad.ToListAsync();
 
-            var listaDTO = facultades.Select(f => new FacultadDTO
+            var listaDTO = lista.Select(f => new FacultadDTO
             {
                 FacultadId = f.FacultadId,
                 Nombre = f.Nombre,
-                CampusId = f.CampusId,
-                Campus = f.Campus == null ? null : new CampusDTO
-                {
-                    CampusId = f.Campus.CampusId,
-                    Nombre = f.Campus.Nombre,
-                    Direccion = f.Campus.Direccion
-                }
+                CampusId = f.CampusId
             }).ToList();
 
             return Ok(listaDTO);
         }
 
-        // GET: api/Facultad/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FacultadDTO>> GetFacultad(int id)
         {
-            var f = await _context.Facultad
-                .Include(fa => fa.Campus)
-                .FirstOrDefaultAsync(fa => fa.FacultadId == id);
+            var facultad = await _context.Facultad.FindAsync(id);
 
-            if (f == null)
+            if (facultad == null)
                 return NotFound();
 
             var dto = new FacultadDTO
             {
-                FacultadId = f.FacultadId,
-                Nombre = f.Nombre,
-                CampusId = f.CampusId
+                FacultadId = facultad.FacultadId,
+                Nombre = facultad.Nombre,
+                CampusId = facultad.CampusId
             };
 
             return Ok(dto);
         }
 
-        // POST: api/Facultad
         [HttpPost]
-        public async Task<ActionResult<Facultad>> PostFacultad(FacultadDTO dto)
+        public async Task<ActionResult<FacultadDTO>> PostFacultad(FacultadDTO dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             var facultad = new Facultad
             {
                 Nombre = dto.Nombre,
@@ -83,12 +68,9 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return CreatedAtAction(nameof(GetFacultad), new { id = facultad.FacultadId }, dto);
         }
 
-        // PUT: api/Facultad/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutFacultad(int id, FacultadDTO dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             if (id != dto.FacultadId)
                 return BadRequest();
 
@@ -104,7 +86,6 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Facultad/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFacultad(int id)
         {
@@ -118,9 +99,5 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
             return NoContent();
         }
 
-        private bool FacultadExists(int id)
-        {
-            return _context.Facultad.Any(e => e.FacultadId == id);
-        }
     }
 }

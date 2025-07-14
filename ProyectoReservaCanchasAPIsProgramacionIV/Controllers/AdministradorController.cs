@@ -19,36 +19,56 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
 
         // GET: api/Administrador
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Administrador>>> GetAdministradors()
+        public async Task<ActionResult<IEnumerable<AdministradorDTO>>> GetAdministradores()
         {
-            return await _context.Administrador
-                .Include(a => a.Facultad)
-                .ThenInclude(f => f.Campus)
-                .ToListAsync();
+            var lista = await _context.Administrador.ToListAsync();
+
+            var listaDTO = lista.Select(a => new AdministradorDTO
+            {
+                BannerId = a.BannerId,
+                Nombre = a.Nombre,
+                Correo = a.Correo,
+                Password = a.Password,
+                Telefono = a.Telefono,
+                Direccion = a.Direccion,
+                FechaNacimiento = a.FechaNacimiento,
+                FacultadId = a.FacultadId
+            }).ToList();
+
+            return Ok(listaDTO);
         }
 
         // GET: api/Administrador/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Administrador>> GetAdministrador(int id)
+        public async Task<ActionResult<AdministradorDTO>> GetAdministrador(int id)
         {
-            var item = await _context.Administrador
-                .Include(a => a.Facultad)
-                .ThenInclude(f => f.Campus)
-                .FirstOrDefaultAsync(a => a.BannerId == id);
-
-            if (item == null)
+            var admin = await _context.Administrador.FindAsync(id);
+            if (admin == null)
                 return NotFound();
 
-            return item;
+            var dto = new AdministradorDTO
+            {
+                BannerId = admin.BannerId,
+                Nombre = admin.Nombre,
+                Correo = admin.Correo,
+                Password = admin.Password,
+                Telefono = admin.Telefono,
+                Direccion = admin.Direccion,
+                FechaNacimiento = admin.FechaNacimiento,
+                FacultadId = admin.FacultadId
+            };
+
+            return Ok(dto);
         }
 
         // POST: api/Administrador
         [HttpPost]
-        public async Task<ActionResult<Administrador>> PostAdministrador(AdministradorDTO dto)
+        public async Task<ActionResult<AdministradorDTO>> PostAdministrador(AdministradorDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var item = new Administrador
+
+            var admin = new Administrador
             {
                 Nombre = dto.Nombre,
                 Correo = dto.Correo,
@@ -56,14 +76,16 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
                 Telefono = dto.Telefono,
                 Direccion = dto.Direccion,
                 FechaNacimiento = dto.FechaNacimiento,
-                TipoPersona = "Administrador", // Asignar un tipo de persona por defecto
+                TipoPersona = "Administrador",
                 FacultadId = dto.FacultadId
             };
 
-            _context.Administrador.Add(item);
+            _context.Administrador.Add(admin);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetAdministrador), new { id = item.BannerId }, item);
+            dto.BannerId = admin.BannerId; // Actualizar id generado
+
+            return CreatedAtAction(nameof(GetAdministrador), new { id = admin.BannerId }, dto);
         }
 
         // PUT: api/Administrador/5
@@ -72,20 +94,22 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var administrador = await _context.Administrador.FindAsync(id);
 
-            if (administrador == null)
+            if (id != dto.BannerId)
+                return BadRequest();
+
+            var admin = await _context.Administrador.FindAsync(id);
+            if (admin == null)
                 return NotFound();
 
-            // Actualizar solo las propiedades necesarias
-            administrador.Nombre = dto.Nombre;
-            administrador.Correo = dto.Correo;
-            administrador.Password = dto.Password;
-            administrador.Telefono = dto.Telefono;
-            administrador.Direccion = dto.Direccion;
-            administrador.FechaNacimiento = dto.FechaNacimiento;
-            administrador.TipoPersona = "Administrador"; // Asignar un tipo de persona por defecto
-            administrador.FacultadId = dto.FacultadId;
+            admin.Nombre = dto.Nombre;
+            admin.Correo = dto.Correo;
+            admin.Password = dto.Password;
+            admin.Telefono = dto.Telefono;
+            admin.Direccion = dto.Direccion;
+            admin.FechaNacimiento = dto.FechaNacimiento;
+            admin.TipoPersona = "Administrador";
+            admin.FacultadId = dto.FacultadId;
 
             try
             {
@@ -106,11 +130,11 @@ namespace ProyectoReservaCanchasAPIsProgramacionIV.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAdministrador(int id)
         {
-            var item = await _context.Administrador.FindAsync(id);
-            if (item == null)
+            var admin = await _context.Administrador.FindAsync(id);
+            if (admin == null)
                 return NotFound();
 
-            _context.Administrador.Remove(item);
+            _context.Administrador.Remove(admin);
             await _context.SaveChangesAsync();
 
             return NoContent();
